@@ -39,7 +39,8 @@ jobs:
 
       - name: Test 3 — hook mode returns hookSpecificOutput
         run: |
-          out="$(echo '{\"hook_event_name\":\"SessionStart\"}' | bash time-anchor.sh hook)"
+          printf '%s' '{"hook_event_name":"SessionStart"}' > /tmp/t3.json
+          out="$(bash time-anchor.sh hook < /tmp/t3.json)"
           echo "$out"
           echo "$out" | python3 -c "
           import json, sys
@@ -53,7 +54,8 @@ jobs:
 
       - name: Test 4 — UserPromptSubmit event passes through
         run: |
-          out="$(echo '{\"hook_event_name\":\"UserPromptSubmit\"}' | bash time-anchor.sh hook)"
+          printf '%s' '{"hook_event_name":"UserPromptSubmit"}' > /tmp/t4.json
+          out="$(bash time-anchor.sh hook < /tmp/t4.json)"
           echo "$out"
           echo "$out" | python3 -c "
           import json, sys
