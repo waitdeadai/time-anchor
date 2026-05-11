@@ -89,7 +89,8 @@ bash time-anchor.sh hook     # full hook response (default)
 
 Part of a small series of single-purpose Claude Code hooks extracted from the [minmaxing](https://github.com/waitdeadai/minmaxing) governance harness.
 
-- [no-vibes](https://github.com/waitdeadai/no-vibes) — blocks Claude from claiming work is done without verification evidence.
+- [no-vibes](https://github.com/waitdeadai/no-vibes) — blocks Claude from claiming work is finished without verification evidence.
+- [no-curfew](https://github.com/waitdeadai/no-curfew) — suppresses unsolicited rest/sleep/wellness paternalism in agent-mode sessions.
 - [minmaxing](https://github.com/waitdeadai/minmaxing) — the full governance harness these hooks were extracted from.
 
 ## License
