@@ -1,0 +1,32 @@
+{
+  "_comment": [
+    "Minimal Claude Code settings.json snippet to wire time-anchor.",
+    "Merge these `hooks` entries into your own .claude/settings.json.",
+    "If you already have hooks defined for these events, append the time-anchor command to the existing matchers' hook arrays."
+  ],
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/time-anchor.sh\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/time-anchor.sh\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ]
+  }
+}

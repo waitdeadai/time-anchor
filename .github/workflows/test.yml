@@ -1,0 +1,76 @@
+name: tests
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    name: Smoke tests (Ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify dependencies
+        run: |
+          bash --version | head -1
+          python3 --version
+
+      - name: Test 1 — text mode emits the anchor block
+        run: |
+          out="$(bash time-anchor.sh text)"
+          echo "$out"
+          echo "$out" | grep -q "temporal anchor from the local system clock" || { echo "FAIL: missing header"; exit 1; }
+          echo "$out" | grep -q "local_time:" || { echo "FAIL: missing local_time"; exit 1; }
+          echo "$out" | grep -q "Temporal reasoning rules:" || { echo "FAIL: missing rules block"; exit 1; }
+
+      - name: Test 2 — json mode emits valid JSON with the right keys
+        run: |
+          out="$(bash time-anchor.sh json)"
+          echo "$out"
+          echo "$out" | python3 -c "
+          import json, sys
+          d = json.load(sys.stdin)
+          for k in ['local_time','utc_time','timezone_name','local_date','weekday','epoch_seconds']:
+              assert k in d, f'missing key: {k}'
+          print('all required keys present')
+          "
+
+      - name: Test 3 — hook mode returns hookSpecificOutput
+        run: |
+          out="$(echo '{\"hook_event_name\":\"SessionStart\"}' | bash time-anchor.sh hook)"
+          echo "$out"
+          echo "$out" | python3 -c "
+          import json, sys
+          d = json.load(sys.stdin)
+          assert 'hookSpecificOutput' in d, 'missing hookSpecificOutput'
+          assert d['hookSpecificOutput']['hookEventName'] == 'SessionStart'
+          assert 'additionalContext' in d['hookSpecificOutput']
+          assert 'temporal anchor' in d['hookSpecificOutput']['additionalContext']
+          print('hook output shape correct')
+          "
+
+      - name: Test 4 — UserPromptSubmit event passes through
+        run: |
+          out="$(echo '{\"hook_event_name\":\"UserPromptSubmit\"}' | bash time-anchor.sh hook)"
+          echo "$out"
+          echo "$out" | python3 -c "
+          import json, sys
+          d = json.load(sys.stdin)
+          assert d['hookSpecificOutput']['hookEventName'] == 'UserPromptSubmit'
+          print('UserPromptSubmit pass-through correct')
+          "
+
+      - name: Test 5 — invalid command returns exit 2
+        run: |
+          set +e
+          bash time-anchor.sh nonsense 2>err.log
+          ec=$?
+          set -e
+          cat err.log
+          test $ec -eq 2 || { echo "FAIL: expected exit 2 got $ec"; exit 1; }
+          grep -q "Usage:" err.log || { echo "FAIL: expected Usage: in stderr"; exit 1; }
+
+      - name: Summary
+        run: echo "All five smoke tests behaved as documented in RECEIPTS.md."

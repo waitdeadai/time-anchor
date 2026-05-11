@@ -1,0 +1,48 @@
+name: Bug report
+description: time-anchor produced wrong / unexpected output.
+labels: [bug]
+body:
+  - type: textarea
+    id: command
+    attributes:
+      label: Command run
+      description: Exact invocation, e.g. `bash time-anchor.sh text` or the JSON payload piped in.
+      render: bash
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed output
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected output
+      render: text
+    validations:
+      required: true
+  - type: input
+    id: python-version
+    attributes:
+      label: python3 version
+      placeholder: Python 3.12.3
+    validations:
+      required: true
+  - type: input
+    id: shell
+    attributes:
+      label: Shell + OS
+      placeholder: bash 5.1 on Ubuntu 24.04
+    validations:
+      required: true
+  - type: input
+    id: timezone
+    attributes:
+      label: System timezone
+      description: Output of `date +%Z` or your timezone setting.
+      placeholder: "-03"
+    validations:
+      required: false
